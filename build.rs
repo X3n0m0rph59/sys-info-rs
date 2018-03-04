@@ -1,14 +1,20 @@
-extern crate gcc;
+extern crate cc;
+
+use std::env;
 
 fn main() {
-    if cfg!(target_os = "linux") {
-        gcc::compile_library("libinfo.a", &["c/linux.c"]);
-    } else if cfg!(target_os = "macos") {
-        gcc::compile_library("libinfo.a", &["c/macos.c"]);
-    } else if cfg!(target_os = "windows") {
-        gcc::compile_library("libinfo.a", &["c/windows.c"]);
-        println!("cargo:rustc-flags=-l psapi");
-    } else {
-        panic!("Unsupported system");
-    }
+    let target = env::var("TARGET").unwrap();
+    let target_os = target.split('-').nth(2).unwrap();
+
+    let mut builder = cc::Build::new();
+    match target_os {
+        "linux" | "android" | "androideabi" => builder.file("c/linux.c"),
+        "darwin" | "ios" => builder.file("c/macos.c"),
+        "windows" => {
+            println!("cargo:rustc-flags=-l psapi");
+            builder.file("c/windows.c")
+        },
+        _ => panic!("unsupported system: {}", target_os)
+    };
+    builder.compile("info");
 }

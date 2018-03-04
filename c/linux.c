@@ -8,6 +8,7 @@
 
 #define DFHASHSIZE 101
 #define MOUNTS "/proc/mounts"
+static const char *os_type = "Windows";
 
 /* Internal Declarations */
 struct nlist {
@@ -29,31 +30,58 @@ float device_space(char*, char*, double*, double*);
   /proc/sys/kernel
 */
 
+const char *get_os_type(void) {
+	return os_type;
+}
+
+const char *get_os_release(void) {
+	return "";
+}
+
 unsigned int get_cpu_num(void) {
 	return get_nprocs();
 }
+
 
 /*
   get_cpu_speed
   /sys/devices/system/cpu/cpu0
 */
 
+unsigned long get_cpu_speed(void) {
+    return 0;
+}
+
 /*
   get_loadavg & get_proc_total
   /proc/loadavg
 */
+
+LoadAvg get_loadavg(void) {
+    LoadAvg avg;
+    return avg;
+}
+
+unsigned long get_proc_total(void) {
+    return 0;
+}
 
 /*
   get_mem_info
   /proc/meminfo
 */
 
+MemInfo get_mem_info(void) {
+    MemInfo info;
+    return info;
+}
+
 DiskInfo get_disk_info(void) {
 	FILE *mounts;
 	char procline[1024];
 	char *mount, *device, *type, *mode, *other;
 	float thispct, max=0.0;
-	double dtotal, dfree;
+	double dtotal=0.0, dfree=0.0;
 	DiskInfo di;
 	
 	di.total = 0;
